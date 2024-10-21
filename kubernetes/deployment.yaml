@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tornado-object-storage
+    version: latest
+  name: tornado-object-storage
+  namespace: object-storage
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tornado-object-storage
+  template:
+    metadata:
+      labels:
+        app: tornado-object-storage
+    spec:
+      containers:
+        - name: tornado-object-storage
+          image: ghcr.io/kyoobit/tornado-object-storage:latest
+          args:
+            - --verbose
+          ports:
+            - containerPort: 8888
+              name: "object-storage"

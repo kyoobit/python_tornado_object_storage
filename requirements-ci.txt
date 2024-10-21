@@ -1,0 +1,11 @@
+# Required for application functionality
+-r requirements.txt
+# Required for continuous intigration
+pytest
+black
+coverage
+flake8
+flake8-bugbear
+# Required for vulnerability checks
+jake
+bandit

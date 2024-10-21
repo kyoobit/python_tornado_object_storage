@@ -1,0 +1,14 @@
+[DEFAULT]
+port = 8888
+access_key = None
+secret_key = None
+endpoint = s3.amazonaws.com
+bucket = test
+service = s3
+region = us-east-1
+scheme = https
+admin = False
+auth_only = False
+systemd = False
+verbose = False
+debug = False

@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tornado-object-storage
+  namespace: object-storage
+spec:
+  containers:
+    - name: tornado-object-storage
+      image: ghcr.io/kyoobit/tornado-object-storage:latest
+      args:
+        - --verbose
+      ports:
+        - containerPort: 8888
+          name: "object-storage"
