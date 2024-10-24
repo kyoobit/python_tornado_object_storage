@@ -12,3 +12,10 @@ auth_only = False
 systemd = False
 verbose = False
 debug = False
+
+[PRODUCTION]
+verbose = True
+access_key = <YOUR ACCESS KEY>
+secret_key = <YOUR SECRET KEY>
+endpoint = <YOUR ENDPOINT>
+bucket = <YOUR BUCKET>
