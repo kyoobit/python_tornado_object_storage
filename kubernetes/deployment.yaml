@@ -8,7 +8,7 @@ metadata:
   name: tornado-object-storage
   namespace: object-storage
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: tornado-object-storage
@@ -17,11 +17,48 @@ spec:
       labels:
         app: tornado-object-storage
     spec:
+      volumes:
+        ## kubectl create secret generic object-storage-ini -n object-storage --from-file config.ini
+        - name: config-ini
+          secret:
+            secretName: object-storage-ini
+        ## kubectl create configmap object-storage-nginx-conf -n object-storage --from-file nginx.conf
+        - name: nginx-conf
+          configMap:
+            name: object-storage-nginx-conf
+        - name: nginx-cache-data
+          persistentVolumeClaim:
+            claimName: nginx-cache
       containers:
+        ## POD=$(kubectl get pods -n object-storage -o json | jq '.items[0].metadata.name' | sed 's|"||g')
+        ## kubectl exec --stdin --tty ${POD} -c tornado-object-storage -n object-storage -- /bin/ash
         - name: tornado-object-storage
-          image: ghcr.io/kyoobit/tornado-object-storage:latest
+          #image: ghcr.io/kyoobit/tornado-object-storage:latest
+          image: docker.io/library/alpine:latest
           args:
-            - --verbose
+            - sleep
+            - infinity
           ports:
             - containerPort: 8888
               name: "object-storage"
+          volumeMounts:
+            ## /config/config.ini
+            - name: config-ini
+              mountPath: "/config"
+        ## POD=$(kubectl get pods -n object-storage -o json | jq '.items[0].metadata.name' | sed 's|"||g')
+        ## kubectl exec --stdin --tty ${POD} -c nginx -n object-storage -- /bin/ash
+        - name: nginx
+          #image: docker.io/nginxinc/nginx-unprivileged:alpine-slim
+          image: docker.io/library/alpine:latest
+          args:
+            - sleep
+            - infinity
+          ports:
+            - containerPort: 8080
+              name: "object-storage"
+          volumeMounts:
+            ## /etc/nginx/nginx.conf
+            - name: nginx-conf
+              mountPath: "/etc/nginx"
+            - name: nginx-cache-data
+              mountPath: "/data/nginx"
