@@ -148,6 +148,7 @@ if __name__ == "__main__":
     # Miscellaneous application settings
     parser.add_argument(
         "--port",
+        default=8888,
         metavar="<N>",
         type=int,
         help="Set the port this HTTP service will listen on",
