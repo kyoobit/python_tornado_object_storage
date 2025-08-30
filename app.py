@@ -155,7 +155,7 @@ class AWSv4Handler(tornado.web.RequestHandler):
         )
         if self.settings.get("auth_only", False) or self.request.headers.get(
             "X-Auth-Only", False
-        ):            
+        ):
             # With auth-only never cache
             self.set_header("Cache-Control", "private, no-store")
             self.set_header("Content-Type", "text/plain")

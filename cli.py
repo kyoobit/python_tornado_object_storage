@@ -40,7 +40,7 @@ def handle_config(argv: argparse.Namespace, remaining_argv: list) -> dict:
 
     # Set the values in `argv' to the values parsed from the configuration file
     # ONLY if the value is None. Non-None values are ass-u-me-d to be set by
-    # the command-line and intended to override some value set in the 
+    # the command-line and intended to override some value set in the
     # configuration file
     for key, value in config[section].items():
         # Debug message
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         "-k",
         metavar="<key>",
         dest="access_key",
-        default=os.environ.get('OSS_ACCESS_KEY'),
+        default=os.environ.get("OSS_ACCESS_KEY"),
         help="Set the API access key to use (Default: environment var OSS_ACCESS_KEY)",
     )
     parser.add_argument(
@@ -136,22 +136,22 @@ if __name__ == "__main__":
         "-s",
         metavar="<key>",
         dest="secret_key",
-        default=os.environ.get('OSS_SECRET_KEY'),
+        default=os.environ.get("OSS_SECRET_KEY"),
         help="Set the API secret key to use (Default: environment var OSS_SECRET_KEY)",
     )
     parser.add_argument(
         "--endpoint",
         "-e",
         metavar="<host>",
-        default=os.environ.get('OSS_ENDPOINT'),
-        help="Set the endpoint to use (Default: environment var OSS_ENDPOINT)"
+        default=os.environ.get("OSS_ENDPOINT"),
+        help="Set the endpoint to use (Default: environment var OSS_ENDPOINT)",
     )
     parser.add_argument(
         "--bucket",
         "-b",
         metavar="<str>",
-        default=os.environ.get('OSS_BUCKET'),
-        help="Set the bucket to use (Default: environment var OSS_BUCKET)"
+        default=os.environ.get("OSS_BUCKET"),
+        help="Set the bucket to use (Default: environment var OSS_BUCKET)",
     )
     parser.add_argument("--service", metavar="<str>", help="Set the service to use")
     parser.add_argument("--region", metavar="<str>", help="Set the region to use")
