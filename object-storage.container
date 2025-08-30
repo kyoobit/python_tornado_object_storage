@@ -1,0 +1,30 @@
+[Unit]
+Description=Object Storage Container Service
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/kyoobit/tornado-object-storage:latest
+ContainerName=object-storage
+PublishPort=8891:8888
+EnvironmentFile=/home/podrunner/.config/containers/object-storage.env
+Exec=--verbose
+# Ensure the container runs in foreground mode
+PodmanArgs=--log-driver=journald
+
+[Service]
+Type=notify
+NotifyAccess=all
+Restart=always
+TimeoutStartSec=900
+TimeoutStopSec=70
+
+[Install]
+WantedBy=default.target
+
+# Podman rootless Quadlet-generated systemd unit
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html
+# ~/.config/containers/systemd/object-storage.container
+# systemctl --user daemon-reload
+# systemctl --user start object-storage.service
+# systemctl --user status object-storage.service
