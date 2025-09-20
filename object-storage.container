@@ -8,7 +8,7 @@ Image=ghcr.io/kyoobit/tornado-object-storage:latest
 ContainerName=object-storage
 PublishPort=8891:8888
 EnvironmentFile=/home/podrunner/.config/containers/object-storage.env
-Exec=--verbose
+Exec=--systemd --verbose
 # Ensure the container runs in foreground mode
 PodmanArgs=--log-driver=journald
 
