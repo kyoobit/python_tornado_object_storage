@@ -49,7 +49,7 @@ jobs:
       - name: Test application functionality
         run: make test
 
-      - name: Dependency check for known vulnarbilities
+      - name: Dependency check for known vulnerabilities
         run: make depcheck
         env:
           ## https://ossindex.sonatype.org/
