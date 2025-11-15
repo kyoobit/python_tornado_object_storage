@@ -31,7 +31,14 @@ test: ## Test the application
 
 depcheck: ## Dependency check for known vulnarbilities
 	# Perform a scan of dependancies backed by the OSS Index
-	$(VENV_BIN)/jake --warn-only ddt
+	# Requires env vars: OSS_INDEX_USER OSS_INDEX_PASSWORD to be set
+	# TODO: Watch for an update that allows the use of a token in ossindex-python
+	# https://github.com/sonatype-nexus-community/ossindex-python/blob/main/docs/usage.rst#authenticating-to-oss-index
+	@if [ ! -f "~/.oss-index.config" ]; then \
+		echo "username: $(OSS_INDEX_USER)" > ~/.oss-index.config; \
+		echo "password: $(OSS_INDEX_PASSWORD)" >> ~/.oss-index.config; \
+	fi
+	$(VENV_BIN)/jake --warn-only ddt --input-type ENV
 
 secscan: ## Run a source code security analyzer
 	# Analyze the application files

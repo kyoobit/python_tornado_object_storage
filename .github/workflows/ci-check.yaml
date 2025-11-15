@@ -1,4 +1,6 @@
 name: CI Checks
+permissions:
+  contents: read
 
 ## This workflow runs when any of the following occur:
 ## * A push is made to the main branch
@@ -19,16 +21,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13", "3.14.0-rc.2"]
+        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
       ## https://github.com/actions/checkout
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       ## https://github.com/actions/setup-python
       ## https://github.com/actions/python-versions
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -49,6 +51,12 @@ jobs:
 
       - name: Dependency check for known vulnarbilities
         run: make depcheck
+        env:
+          ## https://ossindex.sonatype.org/
+          ## https://github.com/sonatype-nexus-community/ossindex-python/blob/main/docs/usage.rst#authenticating-to-oss-index
+          OSS_INDEX_USER: ${{ secrets.OSS_INDEX_USER }}
+          OSS_INDEX_PASSWORD: ${{ secrets.OSS_INDEX_PASSWORD }}
+          OSS_INDEX_API_TOKEN: ${{ secrets.OSS_INDEX_API_TOKEN }}
 
       - name: Run a source code security analyzer
         run: make secscan
