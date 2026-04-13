@@ -367,7 +367,7 @@ class AWSv4Handler(tornado.web.RequestHandler):
             [
                 algorithm,
                 f"Credential={self.settings.get('access_key')}/{credential_scope},",
-                f"SignedHeaders={signed_headers}," f"Signature={aws4_signature}",
+                f"SignedHeaders={signed_headers},Signature={aws4_signature}",
             ]
         )
         logging.debug(f"{name} - authorization_header: {authorization_header!r}")

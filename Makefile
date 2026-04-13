@@ -1,64 +1,70 @@
 # Makefile for python_tornado_object_storage
 # https://www.gnu.org/software/make/manual/make.html
 SHELL := /bin/sh
-VENV = venv
-VENV_BIN = ./$(VENV)/bin
 
-install: requirements-ci.txt ## Install the application requirements
-	# Use `python3` from the current environment to create a virtual environment
-	python3 -m venv $(VENV)
-	# Upgrade PIP in the virtual environment
-	$(VENV_BIN)/python -m pip install --upgrade pip
-	# Install the Python requirements in the virtual environment
-	# CI requirements-ci.txt file includes dependencies for format, lint, and test
-	$(VENV_BIN)/python -m pip install -r requirements-ci.txt
+# Actions that don't require target files
+.PHONY: install install-dev format lint test depcheck secscan all clean help
+
+install: pyproject.toml uv.lock ## Install the application requirements
+	# Set the python version in `.python-version'
+	# Report the `uv' version or install `uv' when missing
+	uv --version || curl -LsSf https://astral.sh/uv/install.sh | sh
+	# Install the Python requirements using `uv' in the virtual environment
+	# Use --frozen for the exact version used in the uv.lock file
+	uv sync --frozen
+
+install-dev: pyproject.toml uv.lock ## Install the application requirements
+	# Set the python version in `.python-version'
+	# Report the `uv' version or install `uv' when missing
+	uv --version || curl -LsSf https://astral.sh/uv/install.sh | sh
+	# Install the Python requirements using `uv' in the virtual environment
+	# Include the development dependencies used for additional CI/CD checks
+	# Upgrade as packages become available (Use --frozen for the exact version)
+	uv sync --all-extras --dev --upgrade
 
 format: ## (Re)Format the application files
-	$(VENV_BIN)/black *.py
-	$(VENV_BIN)/black tests/*.py
+	# (Re)Format the application files
+	uv run ruff format .
 
 lint: ## Lint the application files
-	# Lint the application files
-	$(VENV_BIN)/flake8 --max-line-length 127 *.py
-	# Lint the test files
-	$(VENV_BIN)/flake8 --max-line-length 127 tests/*.py
+	# (Use --fix to automatically fix issues where possible)
+	uv run ruff check .
 
 test: ## Test the application
 	# Test the application
-	$(VENV_BIN)/coverage run -m pytest -v tests/*.py
+	uv run coverage run -m pytest -v tests/*.py
 	# Report code coverage
-	$(VENV_BIN)/coverage report -m
+	uv run coverage report -m
+	# Use `coverage html' to generate a HTML coverage report
 
 depcheck: ## Dependency check for known vulnerabilities
-	# Perform a scan of dependencies backed by the OSS Index
-	# Requires env vars: OSS_INDEX_USER OSS_INDEX_PASSWORD to be set
-	# TODO: Watch for an update that allows the use of a token in ossindex-python
-	# https://github.com/sonatype-nexus-community/ossindex-python/blob/main/docs/usage.rst#authenticating-to-oss-index
-	@if [ ! -f "~/.oss-index.config" ]; then \
-		echo "username: $(OSS_INDEX_USER)" > ~/.oss-index.config; \
-		echo "password: $(OSS_INDEX_PASSWORD)" >> ~/.oss-index.config; \
-	fi
-	$(VENV_BIN)/jake --warn-only ddt --input-type ENV
+	# Perform a scan of dependencies using uv
+	# https://docs.astral.sh/uv/reference/cli/#uv-audit
+	uv audit --verbose --no-cache
 
 secscan: ## Run a source code security analyzer
 	# Analyze the application files
-	$(VENV_BIN)/bandit --recursive *.py
+	# Ignore B101 Use of assert detected, due to laziness of putting tests in the same file
+	uv run bandit --recursive *.py
 
-all: install lint test depcheck secscan
-
-# Actions that don't require target files
-.PHONY: clean
-.PHONY: help
+all: install-dev format lint test depcheck secscan ## Run all checks
 
 help: ## Print a list of make options available
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' ${MAKEFILE_LIST} | sort | \
 	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 clean: ## Clean up files used locally when needed
-	# Remove the Python cache files
-	rm -rf ./__pycache__
-	rm -rf ./tests/__pycache__
-	# Remove the Python pytest files
+	# Remove all Python cache files recursively
+	find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name '*.pyc' -delete 2>/dev/null || true
+	find . -type f -name '*.pyo' -delete 2>/dev/null || true
+	# Remove Python pytest files
 	rm -rf ./.pytest_cache
-	# Remove the Python the virtual environment
-	rm -rf ./$(VENV)
+	# Remove coverage files
+	rm -rf ./.coverage htmlcov/ .coverage.*
+	# Remove build artifacts
+	rm -rf ./build ./dist ./*.egg-info
+	# Remove the Python virtual environment
+	rm -rf ./.venv
+	# Remove uv cache (optional)
+	# uv cache clean
