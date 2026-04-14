@@ -22,8 +22,8 @@ jobs:
       contents: read
 
     steps:
-      ## https://github.com/actions/checkout
-      - uses: actions/checkout@v4
+      ## https://github.com/actions/checkout/releases
+      - uses: actions/checkout@v6
 
       - name: Build the image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
