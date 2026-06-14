@@ -45,7 +45,7 @@ depcheck: ## Dependency check for known vulnerabilities
 secscan: ## Run a source code security analyzer
 	# Analyze the application files
 	# Ignore B101 Use of assert detected, due to laziness of putting tests in the same file
-	uv run bandit --recursive *.py
+	uv run bandit --configfile pyproject.toml --recursive .
 
 all: install-dev format lint test depcheck secscan ## Run all checks
 

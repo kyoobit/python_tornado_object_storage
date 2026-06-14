@@ -2,7 +2,7 @@ import tornado
 
 import pytest
 
-from app import make_app
+from src.app import make_app
 
 
 # https://www.tornadoweb.org/en/stable/testing.html
